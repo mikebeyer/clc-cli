@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk/clc"
+	"github.com/mikebeyer/clc-sdk"
 	"github.com/mikebeyer/clc-sdk/lb"
 )
 

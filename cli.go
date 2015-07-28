@@ -9,8 +9,8 @@ import (
 	"github.com/mikebeyer/clc-cli/lb"
 	"github.com/mikebeyer/clc-cli/server"
 	"github.com/mikebeyer/clc-cli/status"
+	"github.com/mikebeyer/clc-sdk"
 	"github.com/mikebeyer/clc-sdk/api"
-	"github.com/mikebeyer/clc-sdk/clc"
 )
 
 func main() {
