@@ -7,4 +7,4 @@ deps:
 	go get github.com/tools/godep
 	godep restore
 clean:
-	rm clc-*
+	rm clc
