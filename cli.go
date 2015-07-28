@@ -6,6 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/mikebeyer/clc-cli/aa"
 	"github.com/mikebeyer/clc-cli/alert"
+	"github.com/mikebeyer/clc-cli/group"
 	"github.com/mikebeyer/clc-cli/lb"
 	"github.com/mikebeyer/clc-cli/server"
 	"github.com/mikebeyer/clc-cli/status"
@@ -32,6 +33,7 @@ func main() {
 		aa.Commands(client),
 		alert.Commands(client),
 		lb.Commands(client),
+		group.Commands(client),
 	}
 	app.Run(os.Args)
 }
