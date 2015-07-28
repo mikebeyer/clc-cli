@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk/sdk/clc"
-	"github.com/mikebeyer/clc-sdk/sdk/server"
+	"github.com/mikebeyer/clc-sdk/clc"
+	"github.com/mikebeyer/clc-sdk/server"
 )
 
 // Commands exports the cli commands for the server package

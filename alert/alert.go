@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk/sdk/alert"
-	"github.com/mikebeyer/clc-sdk/sdk/clc"
+	"github.com/mikebeyer/clc-sdk/alert"
+	"github.com/mikebeyer/clc-sdk/clc"
 )
 
 // Commands exports the cli commands for the status package

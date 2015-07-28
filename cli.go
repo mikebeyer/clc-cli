@@ -4,13 +4,13 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk/clc/aa"
-	"github.com/mikebeyer/clc-sdk/clc/alert"
-	"github.com/mikebeyer/clc-sdk/clc/lb"
-	"github.com/mikebeyer/clc-sdk/clc/server"
-	"github.com/mikebeyer/clc-sdk/clc/status"
-	"github.com/mikebeyer/clc-sdk/sdk/api"
-	"github.com/mikebeyer/clc-sdk/sdk/clc"
+	"github.com/mikebeyer/clc-cli/aa"
+	"github.com/mikebeyer/clc-cli/alert"
+	"github.com/mikebeyer/clc-cli/lb"
+	"github.com/mikebeyer/clc-cli/server"
+	"github.com/mikebeyer/clc-cli/status"
+	"github.com/mikebeyer/clc-sdk/api"
+	"github.com/mikebeyer/clc-sdk/clc"
 )
 
 func main() {

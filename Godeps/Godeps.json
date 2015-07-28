@@ -1,0 +1,43 @@
+{
+	"ImportPath": "github.com/mikebeyer/clc-cli",
+	"GoVersion": "go1.4.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-135-gf998261",
+			"Rev": "f9982619ccace7df963bb7f6d1de3a6f014ff709"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/aa",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/alert",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/api",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/clc",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/lb",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/server",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/clc-sdk/status",
+			"Rev": "df2f6c3bf66b9a5c25d954a8c2f57d157338df15"
+		},
+		{
+			"ImportPath": "github.com/mikebeyer/env",
+			"Rev": "b6ce30ccdcad3ed9d5ca80329829f5aeaa856e99"
+		}
+	]
+}
