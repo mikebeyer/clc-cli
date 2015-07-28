@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/mikebeyer/clc-cli/util"
 	"github.com/mikebeyer/clc-sdk"
 	"github.com/mikebeyer/clc-sdk/server"
 )
@@ -78,6 +79,13 @@ func create(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "network", Usage: "network id"},
 			cli.StringFlag{Name: "storage", Usage: "standard or premium"},
 		},
+		Before: func(c *cli.Context) error {
+			err := util.CheckStringFlag(c, "name", "cpu", "memory", "group", "source", "type")
+			if err != nil {
+				fmt.Println(err)
+			}
+			return err
+		},
 		Action: func(c *cli.Context) {
 			server := server.Server{
 				Name:           c.String("name"),
@@ -95,11 +103,6 @@ func create(client *clc.Client) cli.Command {
 			server.SecondaryDNS = c.String("secondaryDNS")
 			server.NetworkID = c.String("network")
 			server.Storagetype = c.String("storage")
-
-			if !server.Valid() {
-				fmt.Println("missing required flags to create server. [use --help to show required flags]")
-				return
-			}
 
 			resp, err := client.Server.Create(server)
 			if err != nil {
