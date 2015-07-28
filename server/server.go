@@ -53,38 +53,69 @@ func get(client *clc.Client) cli.Command {
 	}
 }
 
+func createFlags() []cli.Flag {
+	return []cli.Flag{
+		cli.StringFlag{Name: "name, n", Usage: "server name [required]"},
+		cli.StringFlag{Name: "cpu, c", Usage: "server cpus (1 - 16) [required]"},
+		cli.StringFlag{Name: "memory, m", Usage: "server memory in gbs (1 - 128) [required]"},
+		cli.StringFlag{Name: "group, g", Usage: "parent group id [required]"},
+		cli.StringFlag{Name: "source, s", Usage: "source server id (template or existing server) [required or helper flag]"},
+		cli.BoolFlag{Name: "standard", Usage: "standard server"},
+		cli.BoolFlag{Name: "hyperscale", Usage: "hyperscale server [overides storage setting]"},
+		cli.BoolFlag{Name: "premium", Usage: "premium storage"},
+		cli.StringFlag{Name: "password, p", Usage: "server password"},
+		cli.StringFlag{Name: "description, d", Usage: "server description"},
+		cli.StringFlag{Name: "ip", Usage: "id address"},
+		cli.BoolFlag{Name: "managed", Usage: "make server managed"},
+		cli.StringFlag{Name: "primaryDNS", Usage: "primary dns"},
+		cli.StringFlag{Name: "secondaryDNS", Usage: "secondary dns"},
+		cli.StringFlag{Name: "network", Usage: "network id"},
+		cli.StringFlag{Name: "storage", Usage: "standard or premium"},
+	}
+}
+
+func deriveServerType(c *cli.Context) string {
+	if c.Bool("standard") {
+		return "standard"
+	}
+	return "hyperscale"
+}
+
+func deriveStorageType(c *cli.Context) string {
+	if c.Bool("premium") && c.Bool("standard") {
+		return "premium"
+	} else if c.Bool("standard") {
+		return "standard"
+	}
+	return "hyperscale"
+}
+
 func create(client *clc.Client) cli.Command {
 	return cli.Command{
-		Name:    "create",
-		Aliases: []string{"c"},
-		Usage:   "create server",
-		Flags: []cli.Flag{
-			cli.StringFlag{Name: "name, n", Usage: "server name [required]"},
-			cli.StringFlag{Name: "cpu, c", Usage: "server cpus (1 - 16) [required]"},
-			cli.StringFlag{Name: "memory, m", Usage: "server memory in gbs (1 - 128) [required]"},
-			cli.StringFlag{Name: "group, g", Usage: "parent group id [required]"},
-			cli.StringFlag{Name: "source, s", Usage: "source server id (template or existing server) [required]"},
-			cli.StringFlag{Name: "type, t", Usage: "standard or hyperscale [required]"},
-			cli.StringFlag{Name: "password, p", Usage: "server password"},
-			cli.StringFlag{Name: "description, d", Usage: "server description"},
-			cli.StringFlag{Name: "ip", Usage: "id address"},
-			cli.BoolFlag{Name: "managed", Usage: "make server managed"},
-			cli.StringFlag{Name: "primaryDNS", Usage: "primary dns"},
-			cli.StringFlag{Name: "secondaryDNS", Usage: "secondary dns"},
-			cli.StringFlag{Name: "network", Usage: "network id"},
-			cli.StringFlag{Name: "storage", Usage: "standard or premium"},
-		},
+		Name:        "create",
+		Aliases:     []string{"c"},
+		Usage:       "create server",
+		Description: "example: clc server create -n 'my cool server' -c 1 -m 1 -g [group id] -t standard --ubuntu-14",
+		Flags:       append(createFlags(), templateFlags()...),
 		Before: func(c *cli.Context) error {
-			return util.CheckStringFlag(c, "name", "cpu", "memory", "group", "source", "type")
+			err := util.CheckStringFlag(c, "name", "cpu", "memory", "group")
+			if err == nil {
+				err = util.CheckForEitherBooleanFlag(c, "standard", "hyperscale")
+			}
+			return err
 		},
 		Action: func(c *cli.Context) {
+			source, err := findTemplateInContext(c)
+			if err != nil {
+				return
+			}
 			server := server.Server{
 				Name:           c.String("name"),
 				CPU:            c.Int("cpu"),
 				MemoryGB:       c.Int("memory"),
 				GroupID:        c.String("group"),
-				SourceServerID: c.String("source"),
-				Type:           c.String("type"),
+				SourceServerID: source,
+				Type:           deriveServerType(c),
 			}
 			server.Password = c.String("password")
 			server.Description = c.String("description")
@@ -93,7 +124,7 @@ func create(client *clc.Client) cli.Command {
 			server.PrimaryDNS = c.String("primaryDNS")
 			server.SecondaryDNS = c.String("secondaryDNS")
 			server.NetworkID = c.String("network")
-			server.Storagetype = c.String("storage")
+			server.Storagetype = deriveStorageType(c)
 
 			resp, err := client.Server.Create(server)
 			if err != nil {
