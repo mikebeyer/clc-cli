@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -36,11 +35,7 @@ func get(client *clc.Client) cli.Command {
 		Aliases: []string{"g"},
 		Usage:   "get server details",
 		Before: func(c *cli.Context) error {
-			if c.Args().First() == "" {
-				fmt.Println("usage: get [server]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
 			server, err := client.Server.Get(c.Args().First())
@@ -80,11 +75,7 @@ func create(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "storage", Usage: "standard or premium"},
 		},
 		Before: func(c *cli.Context) error {
-			err := util.CheckStringFlag(c, "name", "cpu", "memory", "group", "source", "type")
-			if err != nil {
-				fmt.Println(err)
-			}
-			return err
+			return util.CheckStringFlag(c, "name", "cpu", "memory", "group", "source", "type")
 		},
 		Action: func(c *cli.Context) {
 			server := server.Server{
@@ -125,11 +116,7 @@ func delete(client *clc.Client) cli.Command {
 		Aliases: []string{"d"},
 		Usage:   "delete server",
 		Before: func(c *cli.Context) error {
-			if c.Args().First() == "" {
-				fmt.Println("usage: delete [server]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
 			server, err := client.Server.Delete(c.Args().First())
@@ -156,11 +143,7 @@ func archive(client *clc.Client) cli.Command {
 			cli.StringSliceFlag{Name: "name, n", Usage: "name of servers to archive"},
 		},
 		Before: func(c *cli.Context) error {
-			if len(c.StringSlice("name")) == 0 {
-				fmt.Println("usage: -n [server] -n [server]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckStringSliceFlag(c, "name")
 		},
 		Action: func(c *cli.Context) {
 			resp, err := client.Server.Archive(c.StringSlice("name")...)
@@ -188,11 +171,7 @@ func restore(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "group, g", Usage: "group for server to restore to [required]"},
 		},
 		Before: func(c *cli.Context) error {
-			if c.String("name") == "" || c.String("group") == "" {
-				fmt.Println("missing required flags [--help for additional information]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckStringFlag(c, "name", "group")
 		},
 		Action: func(c *cli.Context) {
 			resp, err := client.Server.Restore(c.String("name"), c.String("group"))
@@ -233,11 +212,7 @@ func getIP(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "ip", Usage: "ip [required]"},
 		},
 		Before: func(c *cli.Context) error {
-			if c.String("name") == "" || c.String("ip") == "" {
-				fmt.Println("usage: missing required flags [--help for additional information]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckStringFlag(c, "name", "ip")
 		},
 		Action: func(c *cli.Context) {
 			resp, err := client.Server.GetPublicIP(c.String("name"), c.String("ip"))
@@ -267,11 +242,11 @@ func createIP(client *clc.Client) cli.Command {
 			cli.StringSliceFlag{Name: "restriction, r", Usage: "provide an ip subnet to restrict to access the public ip [ex. 10.0.0.1/24 (must be cidr notation)]"},
 		},
 		Before: func(c *cli.Context) error {
-			if c.String("name") == "" {
-				fmt.Println("usage: --name flag required")
-				return errors.New("")
+			err := util.CheckStringFlag(c, "name")
+			if err == nil {
+				err = util.CheckForAnyOfStringSliceFlag(c, "tcp", "udp")
 			}
-			return nil
+			return err
 		},
 		Action: func(c *cli.Context) {
 			ports := make([]server.Port, 0)
@@ -337,11 +312,7 @@ func deleteIP(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "ip", Usage: "ip [required]"},
 		},
 		Before: func(c *cli.Context) error {
-			if c.String("name") == "" || c.String("ip") == "" {
-				fmt.Println("usage: missing required flags [--help for additional information]")
-				return errors.New("")
-			}
-			return nil
+			return util.CheckStringFlag(c, "name", "ip")
 		},
 		Action: func(c *cli.Context) {
 			resp, err := client.Server.DeletePublicIP(c.String("name"), c.String("ip"))
