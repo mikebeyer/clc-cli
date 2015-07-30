@@ -15,7 +15,13 @@ import (
 )
 
 func main() {
-	client := clc.New(api.EnvConfig())
+	var config api.Config
+	config, err := api.FileConfig("./clc.json")
+	if err != nil {
+		config = api.EnvConfig()
+	}
+
+	client := clc.New(config)
 
 	app := cli.NewApp()
 	app.Name = "clc"
