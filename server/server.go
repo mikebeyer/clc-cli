@@ -40,7 +40,7 @@ func get(client *clc.Client) cli.Command {
 		Action: func(c *cli.Context) {
 			server, err := client.Server.Get(c.Args().First())
 			if err != nil {
-				fmt.Printf("failed to get %s", c.Args().First())
+				fmt.Printf("failed to get %s\n", c.Args().First())
 				return
 			}
 			b, err := json.MarshalIndent(server, "", "  ")

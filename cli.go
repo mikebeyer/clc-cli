@@ -1,6 +1,9 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -15,13 +18,6 @@ import (
 )
 
 func main() {
-	var config api.Config
-	config, err := api.FileConfig("./clc.json")
-	if err != nil {
-		config = api.EnvConfig()
-	}
-
-	client := clc.New(config)
 
 	app := cli.NewApp()
 	app.Name = "clc"
@@ -33,6 +29,35 @@ func main() {
 			Email: "michael.beyer@ctl.io",
 		},
 	}
+	app.Flags = []cli.Flag{
+		cli.BoolFlag{Name: "default-config", Usage: "create template configuration file"},
+	}
+	app.Action = func(c *cli.Context) {
+		if c.Bool("default-config") {
+
+			conf := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS")
+			b, err := json.MarshalIndent(conf, "", "  ")
+			if err != nil {
+				fmt.Printf("unable to generate config template.")
+			}
+
+			err = ioutil.WriteFile("./clc.json", b, 0666)
+			if err != nil {
+				fmt.Printf("unable to generate config template.")
+			}
+			fmt.Printf("config template written to clc.json")
+			return
+		} else if !c.Args().Present() {
+			cli.ShowAppHelp(c)
+		}
+	}
+	var config api.Config
+	config, err := api.FileConfig("./clc.json")
+	if err != nil {
+		config = api.EnvConfig()
+	}
+
+	client := clc.New(config)
 	app.Commands = []cli.Command{
 		server.Commands(client),
 		status.Commands(client),
