@@ -32,7 +32,10 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{Name: "default-config", Usage: "create template configuration file"},
 	}
+	var config api.Config
+	var configErr error
 	app.Action = func(c *cli.Context) {
+		fmt.Println("here")
 		if c.Bool("default-config") {
 
 			conf := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS")
@@ -47,14 +50,21 @@ func main() {
 			}
 			fmt.Printf("config template written to clc.json")
 			return
+		} else if c.String("config") != "" {
+			config, configErr = api.FileConfig(c.String("config"))
+			if configErr != nil {
+				fmt.Printf("unable to find/parse config: %s", c.String("config"))
+			}
 		} else if !c.Args().Present() {
 			cli.ShowAppHelp(c)
 		}
 	}
-	var config api.Config
-	config, err := api.FileConfig("./clc.json")
-	if err != nil {
-		config = api.EnvConfig()
+
+	if config.User.Username == "" {
+		config, configErr = api.FileConfig("./clc.json")
+		if configErr != nil {
+			config = api.EnvConfig()
+		}
 	}
 
 	client := clc.New(config)
