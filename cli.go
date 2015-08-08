@@ -44,26 +44,30 @@ func main() {
 				fmt.Printf("unable to generate config template.")
 			}
 
-			err = ioutil.WriteFile("./clc.json", b, 0666)
+			err = ioutil.WriteFile("./config.json", b, 0666)
 			if err != nil {
 				fmt.Printf("unable to generate config template.")
 			}
-			fmt.Printf("config template written to clc.json")
+			fmt.Printf("config template written to config.json")
 			return
 		} else if c.String("config") != "" {
 			config, configErr = api.FileConfig(c.String("config"))
 			if configErr != nil {
-				fmt.Printf("unable to find/parse config: %s", c.String("config"))
+				fmt.Printf("unable to find/parse config: %s\n", c.String("config"))
+				return
 			}
 		} else if !c.Args().Present() {
 			cli.ShowAppHelp(c)
 		}
 	}
-
-	if config.User.Username == "" {
-		config, configErr = api.FileConfig("./clc.json")
+	if !config.Valid() {
+		config, configErr = api.EnvConfig()
 		if configErr != nil {
-			config = api.EnvConfig()
+			config, configErr = api.FileConfig("./config.json")
+			if configErr != nil {
+				fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
+				return
+			}
 		}
 	}
 
