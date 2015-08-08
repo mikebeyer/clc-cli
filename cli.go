@@ -54,7 +54,6 @@ func main() {
 			config, configErr = api.FileConfig(c.String("config"))
 			if configErr != nil {
 				fmt.Printf("unable to find/parse config: %s\n", c.String("config"))
-				return
 			}
 		} else if !c.Args().Present() {
 			cli.ShowAppHelp(c)
