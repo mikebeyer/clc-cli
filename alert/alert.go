@@ -29,7 +29,7 @@ func Commands(client *clc.Client) cli.Command {
 func get(client *clc.Client) cli.Command {
 	return cli.Command{
 		Name:    "get",
-		Aliases: []string{"a"},
+		Aliases: []string{"g"},
 		Usage:   "get alert policy",
 		Flags: []cli.Flag{
 			cli.BoolFlag{Name: "all", Usage: "retrieve all policies"},
