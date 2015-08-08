@@ -18,7 +18,6 @@ import (
 )
 
 func main() {
-
 	app := cli.NewApp()
 	app.Name = "clc"
 	app.Usage = "clc v2 api cli"
@@ -30,14 +29,13 @@ func main() {
 		},
 	}
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{Name: "default-config", Usage: "create template configuration file"},
+		cli.BoolFlag{Name: "gen-config", Usage: "create template configuration file"},
 	}
 	var config api.Config
+	var client *clc.Client
 	var configErr error
 	app.Action = func(c *cli.Context) {
-		fmt.Println("here")
-		if c.Bool("default-config") {
-
+		if c.Bool("gen-config") {
 			conf := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS")
 			b, err := json.MarshalIndent(conf, "", "  ")
 			if err != nil {
@@ -55,22 +53,23 @@ func main() {
 			if configErr != nil {
 				fmt.Printf("unable to find/parse config: %s\n", c.String("config"))
 			}
-		} else if !c.Args().Present() {
+		} else if c.Bool("help") {
 			cli.ShowAppHelp(c)
-		}
-	}
-	if !config.Valid() {
-		config, configErr = api.EnvConfig()
-		if configErr != nil {
-			config, configErr = api.FileConfig("./config.json")
-			if configErr != nil {
-				fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
-				return
+		} else if !c.Args().Present() {
+			if !config.Valid() {
+				config, configErr = api.EnvConfig()
+				if configErr != nil {
+					config, configErr = api.FileConfig("./config.json")
+					if configErr != nil {
+						fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
+						return
+					}
+				}
 			}
+			client = clc.New(config)
 		}
 	}
 
-	client := clc.New(config)
 	app.Commands = []cli.Command{
 		server.Commands(client),
 		status.Commands(client),
