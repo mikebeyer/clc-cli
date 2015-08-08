@@ -9,7 +9,7 @@
 		},
 		{
 			"ImportPath": "github.com/mikebeyer/clc-sdk",
-			"Rev": "219e091d9338864bca8af274559403a8b6c86564"
+			"Rev": "aef985821c40f112c6360bc72bf5a971dfa2e6aa"
 		},
 		{
 			"ImportPath": "github.com/mikebeyer/env",
