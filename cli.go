@@ -32,7 +32,6 @@ func main() {
 		cli.BoolFlag{Name: "gen-config", Usage: "create template configuration file"},
 	}
 	var config api.Config
-	var client *clc.Client
 	var configErr error
 	app.Action = func(c *cli.Context) {
 		if c.Bool("gen-config") {
@@ -58,19 +57,22 @@ func main() {
 		} else if c.Bool("help") {
 			cli.ShowAppHelp(c)
 		} else if !c.Args().Present() {
-			if !config.Valid() {
-				config, configErr = api.EnvConfig()
-				if configErr != nil {
-					config, configErr = api.FileConfig("./config.json")
-					if configErr != nil {
-						fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
-						return
-					}
-				}
+			if config.Valid() {
+				cli.ShowAppHelp(c)
 			}
-			client = clc.New(config)
 		}
 	}
+	if !config.Valid() {
+		config, configErr = api.EnvConfig()
+		if configErr != nil {
+			config, configErr = api.FileConfig("./config.json")
+			if configErr != nil {
+				fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
+				return
+			}
+		}
+	}
+	client := clc.New(config)
 
 	app.Commands = []cli.Command{
 		server.Commands(client),
