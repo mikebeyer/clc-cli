@@ -39,14 +39,16 @@ func main() {
 			conf := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS")
 			b, err := json.MarshalIndent(conf, "", "  ")
 			if err != nil {
-				fmt.Printf("unable to generate config template.")
+				fmt.Printf("unable to generate config template.\n")
+				return
 			}
 
 			err = ioutil.WriteFile("./config.json", b, 0666)
 			if err != nil {
-				fmt.Printf("unable to generate config template.")
+				fmt.Printf("unable to generate config template.\n")
+				return
 			}
-			fmt.Printf("config template written to config.json")
+			fmt.Printf("config template written to config.json\n")
 			return
 		} else if c.String("config") != "" {
 			config, configErr = api.FileConfig(c.String("config"))
