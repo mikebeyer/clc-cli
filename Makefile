@@ -1,4 +1,4 @@
-VERSION=0.1
+VERSION=0.6.0
 
 .PHONY : build deps clean
 build:
@@ -12,9 +12,12 @@ clean:
 	-rm *.bin
 	-rm *.exe
 release:
-	gox -output="clc_{{.OS}}.bin" -osarch="linux/amd64 darwin/amd64 windows/amd64"
-	tar czf clc_linux.$(VERSION).tar.gz clc_linux.bin
-	tar czf clc_darwin.$(VERSION).tar.gz clc_darwin.bin
-	tar czf clc_windows.$(VERSION).tar.gz clc_windows.bin.exe
-	-rm *.bin
-	-rm *.exe
+	gox -output="clc" -osarch="linux/amd64"
+	tar czf clc_linux.$(VERSION).tar.gz clc
+	rm clc
+	gox -output="clc" -osarch="darwin/amd64"
+	tar czf clc_darwin.$(VERSION).tar.gz clc
+	rm clc
+	gox -output="clc" -osarch="windows/amd64"
+	tar czf clc_windows.$(VERSION).tar.gz clc.exe
+	rm clc.exe
