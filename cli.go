@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
+	"github.com/CenturyLinkCloud/clc-sdk/api"
 	"github.com/codegangsta/cli"
 	"github.com/mikebeyer/clc-cli/aa"
 	"github.com/mikebeyer/clc-cli/alert"
@@ -13,8 +15,6 @@ import (
 	"github.com/mikebeyer/clc-cli/lb"
 	"github.com/mikebeyer/clc-cli/server"
 	"github.com/mikebeyer/clc-cli/status"
-	"github.com/mikebeyer/clc-sdk"
-	"github.com/mikebeyer/clc-sdk/api"
 )
 
 func main() {

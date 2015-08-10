@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk"
 )
 
 // Commands exports the cli commands for the status package

@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
+	"github.com/CenturyLinkCloud/clc-sdk/alert"
 	"github.com/codegangsta/cli"
-	"github.com/mikebeyer/clc-sdk"
-	"github.com/mikebeyer/clc-sdk/alert"
 )
 
 // Commands exports the cli commands for the status package

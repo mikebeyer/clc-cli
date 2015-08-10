@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
+	"github.com/CenturyLinkCloud/clc-sdk/server"
 	"github.com/codegangsta/cli"
 	"github.com/mikebeyer/clc-cli/util"
-	"github.com/mikebeyer/clc-sdk"
-	"github.com/mikebeyer/clc-sdk/server"
 )
 
 // Commands exports the cli commands for the server package

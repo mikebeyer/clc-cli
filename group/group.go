@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
+	"github.com/CenturyLinkCloud/clc-sdk/group"
 	"github.com/codegangsta/cli"
 	"github.com/mikebeyer/clc-cli/util"
-	"github.com/mikebeyer/clc-sdk"
-	"github.com/mikebeyer/clc-sdk/group"
 )
 
 func Commands(client *clc.Client) cli.Command {
