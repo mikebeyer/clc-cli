@@ -1,6 +1,6 @@
 clc cli
 ===================
-Insallation
+Installation
 ---------------------
 
 ```sh
