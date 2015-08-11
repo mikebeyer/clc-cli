@@ -25,6 +25,7 @@ func Commands(client *clc.Client) cli.Command {
 			publicIP(client),
 			archive(client),
 			restore(client),
+			sshServer(client),
 		},
 	}
 }
@@ -359,4 +360,47 @@ func deleteIP(client *clc.Client) cli.Command {
 			fmt.Printf("%s\n", b)
 		},
 	}
+}
+
+func sshServer(client *clc.Client) cli.Command {
+	return cli.Command{
+		Name:    "ssh",
+		Aliases: []string{"s"},
+		Usage:   "ssh to server",
+		Before: func(c *cli.Context) error {
+			return util.CheckArgs(c)
+		},
+		Action: func(c *cli.Context) {
+			server, err := client.Server.Get(c.Args().First())
+			if err != nil {
+				fmt.Printf("failed to shh to %s\n", c.Args().First())
+				return
+			}
+			creds, err := client.Server.GetCredentials(c.Args().First())
+			if err != nil {
+				fmt.Printf("failed to shh to %s\n", c.Args().First())
+				return
+			}
+
+			internal, err := getInternal(server)
+			if err != nil {
+				fmt.Printf("failed to shh to %s\n", c.Args().First())
+				return
+			}
+
+			if err := connect(internal, creds); err != nil {
+				fmt.Printf("failed to shh to %s\n", c.Args().First())
+				return
+			}
+		},
+	}
+}
+
+func getInternal(server *server.Response) (string, error) {
+	for _, ip := range server.Details.IPaddresses {
+		if ip.Public == "" && ip.Internal != "" {
+			return ip.Internal, nil
+		}
+	}
+	return "", fmt.Errorf("unable to find ip")
 }

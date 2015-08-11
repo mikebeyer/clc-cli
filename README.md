@@ -76,6 +76,10 @@ Example
 ./clc server create -n 'server' -c 1 -m 1 -g GROUP-ID -t standard --ubuntu-14
 ```
 
+```sh
+./clc server ssh SERVERNAME
+```
+
 License
 -------
 This project is licensed under the [Apache License v2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
