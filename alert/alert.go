@@ -10,6 +10,7 @@ import (
 	"github.com/CenturyLinkCloud/clc-sdk"
 	"github.com/CenturyLinkCloud/clc-sdk/alert"
 	"github.com/codegangsta/cli"
+	"github.com/mikebeyer/clc-cli/util"
 )
 
 // Commands exports the cli commands for the status package
@@ -36,6 +37,11 @@ func get(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "alias, a", Usage: "policy id"},
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			if c.Bool("all") || c.Args().First() == "" {
 				policies, err := client.Alert.GetAll()
 				if err != nil {
@@ -84,6 +90,11 @@ func create(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			a := alert.Alert{
 				Name: c.String("name"),
 			}
@@ -187,7 +198,12 @@ func delete(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
-			err := client.Alert.Delete(c.Args().First())
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			err = client.Alert.Delete(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to get %s", c.Args().First())
 				return

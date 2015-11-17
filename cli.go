@@ -22,6 +22,7 @@ func main() {
 	app.Name = "clc"
 	app.Usage = "clc v2 api cli"
 	app.Version = "0.0.1"
+	app.EnableBashCompletion = true
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Mike Beyer",
@@ -30,6 +31,7 @@ func main() {
 	}
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{Name: "gen-config", Usage: "create template configuration file"},
+		cli.StringFlag{Name: "config", Usage: "specify config file"},
 	}
 	var config api.Config
 	var configErr error
@@ -49,29 +51,29 @@ func main() {
 			}
 			fmt.Printf("config template written to config.json\n")
 			return
-		} else if c.String("config") != "" {
-			config, configErr = api.FileConfig(c.String("config"))
-			if configErr != nil {
-				fmt.Printf("unable to find/parse config: %s\n", c.String("config"))
-			}
 		} else if c.Bool("help") {
 			cli.ShowAppHelp(c)
 		} else if !c.Args().Present() {
-			if config.Valid() {
+			if config.Valid() || c.GlobalString("config") != "" {
 				cli.ShowAppHelp(c)
+			} else {
+				if !config.Valid() && c.GlobalString("config") == "" {
+					config, configErr = api.EnvConfig()
+					if configErr != nil {
+						config, configErr = api.FileConfig("./config.json")
+						if configErr != nil {
+							fmt.Printf("WARNING: failed to find necessary environment variables or default config location (./config.json)\n")
+							fmt.Printf("WARNING: --configure to generate configuration file\n")
+							fmt.Printf("WARNING: --help for all options\n")
+							return
+						}
+					}
+					cli.ShowAppHelp(c)
+				}
 			}
 		}
 	}
-	if !config.Valid() {
-		config, configErr = api.EnvConfig()
-		if configErr != nil {
-			config, configErr = api.FileConfig("./config.json")
-			if configErr != nil {
-				fmt.Printf("failed to find necessary environment variables or default config location (./config.json)\n")
-				return
-			}
-		}
-	}
+
 	client := clc.New(config)
 
 	app.Commands = []cli.Command{

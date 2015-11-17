@@ -9,6 +9,7 @@ import (
 	"github.com/CenturyLinkCloud/clc-sdk"
 	"github.com/CenturyLinkCloud/clc-sdk/lb"
 	"github.com/codegangsta/cli"
+	"github.com/mikebeyer/clc-cli/util"
 )
 
 func Commands(client *clc.Client) cli.Command {
@@ -49,6 +50,11 @@ func get(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			if c.Bool("all") || c.String("id") == "" {
 				resp, err := client.LB.GetAll(c.String("location"))
 				if err != nil {
@@ -89,6 +95,11 @@ func create(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "description, d", Usage: "load balancer description"},
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			name := c.String("name")
 			loc := c.String("location")
 			if name == "" || loc == "" {
@@ -124,6 +135,11 @@ func update(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "description, d", Usage: "load balancer description [required]"},
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			id := c.String("id")
 			loc := c.String("location")
 			name := c.String("name")
@@ -134,7 +150,7 @@ func update(client *clc.Client) cli.Command {
 			}
 
 			lb := lb.LoadBalancer{Name: name, Description: desc}
-			err := client.LB.Update(loc, id, lb)
+			err = client.LB.Update(loc, id, lb)
 			if err != nil {
 				fmt.Printf("failed to update load balancer [%s] in %s\n", lb.Name, loc)
 				return
@@ -161,7 +177,12 @@ func delete(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
-			err := client.LB.Delete(c.String("location"), c.String("id"))
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			err = client.LB.Delete(c.String("location"), c.String("id"))
 			if err != nil {
 				fmt.Printf("failed to get %s\n", c.Args().First())
 				return
@@ -189,6 +210,11 @@ func getPool(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			if c.Bool("all") || c.String("pool") == "" {
 				resp, err := client.LB.GetAllPools(c.String("location"), c.String("id"))
 				if err != nil {
@@ -250,6 +276,11 @@ func createPool(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			pool := lb.Pool{Port: c.Int("port")}
 			if c.Bool("sticky") {
 				pool.Persistence = lb.Sticky
@@ -310,6 +341,11 @@ func updatePool(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			pool := lb.Pool{}
 			if c.Bool("sticky") {
 				pool.Persistence = lb.Sticky
@@ -323,7 +359,7 @@ func updatePool(client *clc.Client) cli.Command {
 				pool.Method = lb.RoundRobin
 			}
 
-			err := client.LB.UpdatePool(c.String("location"), c.String("id"), c.String("pool"), pool)
+			err = client.LB.UpdatePool(c.String("location"), c.String("id"), c.String("pool"), pool)
 			if err != nil {
 				fmt.Printf("failed to update load balancer pool [%s] in %s\n", c.String("pool"), c.String("location"))
 				return
@@ -351,7 +387,12 @@ func deletePool(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
-			err := client.LB.DeletePool(c.String("location"), c.String("id"), c.String("pool"))
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			err = client.LB.DeletePool(c.String("location"), c.String("id"), c.String("pool"))
 			if err != nil {
 				fmt.Printf("failed to get %s\n", c.Args().First())
 				return
@@ -379,6 +420,11 @@ func getNode(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.LB.GetAllNodes(c.String("location"), c.String("id"), c.String("pool"))
 			if err != nil {
 				fmt.Printf("failed to get %s\n", c.Args().First())
@@ -413,6 +459,11 @@ func updateNode(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			nodes := make([]lb.Node, len(c.StringSlice("host")))
 			for i, v := range c.StringSlice("host") {
 				split := strings.Split(v, ":")
@@ -427,7 +478,7 @@ func updateNode(client *clc.Client) cli.Command {
 				}
 				nodes[i] = node
 			}
-			err := client.LB.UpdateNodes(c.String("location"), c.String("id"), c.String("pool"), nodes...)
+			err = client.LB.UpdateNodes(c.String("location"), c.String("id"), c.String("pool"), nodes...)
 			if err != nil {
 				fmt.Printf("failed to update nodes\n")
 				return

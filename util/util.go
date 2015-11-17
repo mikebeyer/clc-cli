@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/CenturyLinkCloud/clc-sdk"
+	"github.com/CenturyLinkCloud/clc-sdk/api"
 	"github.com/codegangsta/cli"
 )
 
@@ -51,4 +53,17 @@ func CheckArgs(c *cli.Context) error {
 func DisplayAndErr(msg string) error {
 	fmt.Println(msg)
 	return fmt.Errorf(msg)
+}
+
+func MaybeLoadConfig(c *cli.Context, client *clc.Client) (*clc.Client, error) {
+	if c.GlobalString("config") != "" {
+		config, err := api.FileConfig(c.GlobalString("config"))
+		if err != nil {
+			return nil, fmt.Errorf("failed to load config at %s", c.GlobalString("config"))
+		}
+
+		return clc.New(config), nil
+	}
+
+	return client, nil
 }

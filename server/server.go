@@ -39,6 +39,11 @@ func get(client *clc.Client) cli.Command {
 			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			server, err := client.Server.Get(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to get %s\n", c.Args().First())
@@ -106,6 +111,11 @@ func create(client *clc.Client) cli.Command {
 			return err
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			source, err := findTemplateInContext(c)
 			if err != nil {
 				return
@@ -151,6 +161,11 @@ func delete(client *clc.Client) cli.Command {
 			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			server, err := client.Server.Delete(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to delete %s", c.Args().First())
@@ -178,6 +193,11 @@ func archive(client *clc.Client) cli.Command {
 			return util.CheckStringSliceFlag(c, "name")
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Server.Archive(c.StringSlice("name")...)
 			if err != nil {
 				fmt.Printf("failed to archive %s", strings.Join(c.StringSlice("name"), ", "))
@@ -206,6 +226,11 @@ func restore(client *clc.Client) cli.Command {
 			return util.CheckStringFlag(c, "name", "group")
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Server.Restore(c.String("name"), c.String("group"))
 			if err != nil {
 				fmt.Printf("failed to restore %s", c.String("name"))
@@ -247,6 +272,11 @@ func getIP(client *clc.Client) cli.Command {
 			return util.CheckStringFlag(c, "name", "ip")
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Server.GetPublicIP(c.String("name"), c.String("ip"))
 			if err != nil {
 				fmt.Printf("err %s\n", err)
@@ -281,6 +311,11 @@ func createIP(client *clc.Client) cli.Command {
 			return err
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			ports := make([]server.Port, 0)
 			tcps, err := parsePort("tcp", c.StringSlice("tcp"))
 			if err != nil {
@@ -347,6 +382,11 @@ func deleteIP(client *clc.Client) cli.Command {
 			return util.CheckStringFlag(c, "name", "ip")
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Server.DeletePublicIP(c.String("name"), c.String("ip"))
 			if err != nil {
 				fmt.Printf("err %s\n", err)
@@ -371,6 +411,11 @@ func sshServer(client *clc.Client) cli.Command {
 			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			server, err := client.Server.Get(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to shh to %s\n", c.Args().First())

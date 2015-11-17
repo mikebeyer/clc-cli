@@ -7,6 +7,7 @@ import (
 
 	"github.com/CenturyLinkCloud/clc-sdk"
 	"github.com/codegangsta/cli"
+	"github.com/mikebeyer/clc-cli/util"
 )
 
 // Commands exports the cli commands for the status package
@@ -33,6 +34,12 @@ func get(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "alias, a", Usage: "account alias"},
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+
 			if c.Bool("all") || c.Args().First() == "" {
 				policies, err := client.AA.GetAll()
 				if err != nil {
@@ -73,6 +80,11 @@ func create(client *clc.Client) cli.Command {
 			cli.StringFlag{Name: "location, l", Usage: "policy location [required]"},
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			name := c.String("name")
 			loc := c.String("location")
 			if name == "" || loc == "" {
@@ -108,7 +120,12 @@ func delete(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
-			err := client.AA.Delete(c.Args().First())
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			err = client.AA.Delete(c.Args().First())
 			if err != nil {
 				fmt.Printf("unable to delete aa policy: [%s]\n", c.Args().First())
 				return

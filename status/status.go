@@ -7,6 +7,7 @@ import (
 
 	"github.com/CenturyLinkCloud/clc-sdk"
 	"github.com/codegangsta/cli"
+	"github.com/mikebeyer/clc-cli/util"
 )
 
 // Commands exports the cli commands for the status package
@@ -31,6 +32,11 @@ func get(client *clc.Client) cli.Command {
 			return nil
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			status, err := client.Status.Get(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to get status of %s", c.Args().First())

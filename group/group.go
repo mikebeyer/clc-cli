@@ -32,6 +32,11 @@ func get(client *clc.Client) cli.Command {
 			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Group.Get(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to get %s", c.Args().First())
@@ -61,6 +66,11 @@ func create(client *clc.Client) cli.Command {
 			return util.CheckStringFlag(c, "name", "parent")
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			g := group.Group{
 				Name:          c.String("name"),
 				ParentGroupID: c.String("parent"),
@@ -90,6 +100,11 @@ func delete(client *clc.Client) cli.Command {
 			return util.CheckArgs(c)
 		},
 		Action: func(c *cli.Context) {
+			client, err := util.MaybeLoadConfig(c, client)
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
 			resp, err := client.Group.Delete(c.Args().First())
 			if err != nil {
 				fmt.Printf("failed to delete %s", c.Args().First())
