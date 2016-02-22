@@ -4,7 +4,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/CenturyLinkCloud/clc-sdk",
-			"Rev": "961da80093693c821cfb8e9030220f96d836aa3e"
+			"Rev": "f1c763bade7d91f2b8914267bd98a8fd207f50f9"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",

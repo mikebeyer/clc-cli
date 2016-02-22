@@ -37,7 +37,11 @@ func main() {
 	var configErr error
 	app.Action = func(c *cli.Context) {
 		if c.Bool("gen-config") {
-			conf := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS")
+			conf, err := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS", "")
+			if err != nil {
+				fmt.Printf("unable to generate config template.\n")
+				return
+			}
 			b, err := json.MarshalIndent(conf, "", "  ")
 			if err != nil {
 				fmt.Printf("unable to generate config template.\n")
@@ -73,6 +77,7 @@ func main() {
 			}
 		}
 	}
+	config, _ = api.EnvConfig()
 
 	client := clc.New(config)
 
