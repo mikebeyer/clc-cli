@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/CenturyLinkCloud/clc-sdk"
@@ -17,12 +18,13 @@ import (
 	"github.com/mikebeyer/clc-cli/status"
 )
 
+var client *clc.Client
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "clc"
 	app.Usage = "clc v2 api cli"
 	app.Version = "0.0.1"
-	app.EnableBashCompletion = true
 	app.Authors = []cli.Author{
 		cli.Author{
 			Name:  "Mike Beyer",
@@ -31,55 +33,36 @@ func main() {
 	}
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{Name: "gen-config", Usage: "create template configuration file"},
-		cli.StringFlag{Name: "config", Usage: "specify config file"},
+		cli.BoolFlag{Name: "gen-config-from-env", Usage: "create configuration file from environment variables"},
 	}
-	var config api.Config
-	var configErr error
 	app.Action = func(c *cli.Context) {
-		if c.Bool("gen-config") {
-			conf, err := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS", "")
-			if err != nil {
-				fmt.Printf("unable to generate config template.\n")
-				return
-			}
-			b, err := json.MarshalIndent(conf, "", "  ")
-			if err != nil {
-				fmt.Printf("unable to generate config template.\n")
+		if !c.Bool("help") {
+			if c.Bool("gen-config") {
+				err := genConfig()
+				if err != nil {
+					fmt.Println("failed to generate default config")
+				}
 				return
 			}
 
-			err = ioutil.WriteFile("./config.json", b, 0666)
-			if err != nil {
-				fmt.Printf("unable to generate config template.\n")
+			if c.Bool("gen-config-from-env") {
+				err := genConfigFromEnv()
+				if err != nil {
+					fmt.Println("failed to generate default config")
+				}
 				return
 			}
-			fmt.Printf("config template written to config.json\n")
-			return
-		} else if c.Bool("help") {
-			cli.ShowAppHelp(c)
-		} else if !c.Args().Present() {
-			if config.Valid() || c.GlobalString("config") != "" {
-				cli.ShowAppHelp(c)
+
+			err := loadClient()
+			if err != nil && !c.Args().Present() {
+				fmt.Println("WARNING: failed to find necessary environment variables or default config location (./config.json)")
+				fmt.Println("         --gen-config to generate configuration file")
+				fmt.Println("         --help for all options")
 			} else {
-				if !config.Valid() && c.GlobalString("config") == "" {
-					config, configErr = api.EnvConfig()
-					if configErr != nil {
-						config, configErr = api.FileConfig("./config.json")
-						if configErr != nil {
-							fmt.Printf("WARNING: failed to find necessary environment variables or default config location (./config.json)\n")
-							fmt.Printf("WARNING: --configure to generate configuration file\n")
-							fmt.Printf("WARNING: --help for all options\n")
-							return
-						}
-					}
-					cli.ShowAppHelp(c)
-				}
+				cli.ShowAppHelp(c)
 			}
 		}
 	}
-	config, _ = api.EnvConfig()
-
-	client := clc.New(config)
 
 	app.Commands = []cli.Command{
 		server.Commands(client),
@@ -89,5 +72,61 @@ func main() {
 		lb.Commands(client),
 		group.Commands(client),
 	}
-	app.Run(os.Args)
+
+	if err := app.Run(os.Args); err != nil {
+		log.Println(err)
+	}
+}
+
+func loadClient() error {
+	var config api.Config
+
+	config, err := api.FileConfig("./config.json")
+	if err != nil {
+		config, err = api.EnvConfig()
+		if err != nil {
+
+			return err
+		}
+	}
+
+	client = clc.New(config)
+	return err
+}
+
+func genConfigFromEnv() error {
+	config, err := api.EnvConfig()
+	if err != nil {
+		return err
+	}
+
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("./config.json", b, 0666)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("config written to config.json from current environment varibales\n")
+	return nil
+}
+
+func genConfig() error {
+	config, err := api.NewConfig("USERNAME", "PASSWORD", "DEFAULT-ALIAS", "")
+	if err != nil {
+		return err
+	}
+	b, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile("./config.json", b, 0666)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("config template written to config.json\n")
+	return nil
 }
